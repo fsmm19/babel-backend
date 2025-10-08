@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BibliographicMaterial {
+  id        String       @id @default(uuid()) @db.Uuid
+  title     String
+  subtitle  String?
+  type      MaterialType
+  authors   Author[]
+  book      Book?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Author {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  firstName              String
+  middleName             String?
+  lastName               String
+  bibliographicMaterials BibliographicMaterial[]
+}
+
+model Book {
+  id                      String                @id @default(uuid()) @db.Uuid
+  isbn_13                 String                @unique
+  edition                 Int?
+  numberOfPages           Int?
+  bibliographicMaterial   BibliographicMaterial @relation(fields: [bibliographicMaterialId], references: [id])
+  bibliographicMaterialId String                @unique @db.Uuid
+}
+
+enum MaterialType {
+  BOOK
+}

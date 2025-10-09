@@ -1,4 +1,3 @@
-import { CreateAuthorDto } from './create-author.dto';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -10,6 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MaterialType } from 'src/generated/prisma/enums';
+import { CreateAuthorDto } from '../authors/dto/create-author.dto';
 
 export class CreateMaterialDto {
   @IsNotEmpty()

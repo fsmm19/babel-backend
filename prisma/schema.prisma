@@ -23,9 +23,13 @@ model BibliographicMaterial {
 model Author {
   id                     String                  @id @default(uuid()) @db.Uuid
   firstName              String
-  middleName             String?
+  middleName             String?                 @default("")
   lastName               String
+  nationality            String?                 @default("")
+  birthDate              DateTime?               @db.Date
   bibliographicMaterials BibliographicMaterial[]
+
+  @@unique([firstName, middleName, lastName, nationality])
 }
 
 model Book {

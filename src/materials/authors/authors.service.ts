@@ -34,7 +34,7 @@ export class AuthorsService {
     return author;
   }
 
-  async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+  async update(id: string, updateAuthorDto: UpdateAuthorDto): Promise<Author> {
     await this.findOne(id);
 
     return await this.prisma.author.update({

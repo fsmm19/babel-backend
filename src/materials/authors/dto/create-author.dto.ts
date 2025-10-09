@@ -1,8 +1,10 @@
 import {
   IsDateString,
+  IsISO31661Alpha3,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUppercase,
 } from 'class-validator';
 
 export class CreateAuthorDto {
@@ -20,8 +22,8 @@ export class CreateAuthorDto {
   lastName: string;
 
   @IsOptional()
-  @IsNotEmpty()
-  @IsString()
+  @IsISO31661Alpha3()
+  @IsUppercase()
   nationality?: string;
 
   @IsOptional()

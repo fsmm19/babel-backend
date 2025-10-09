@@ -26,7 +26,6 @@ export class CreateMaterialDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateAuthorDto)
   authors: CreateAuthorDto[];

@@ -21,6 +21,17 @@ export class AuthorsService {
     });
   }
 
+  async createMany(createAuthorsDto: CreateAuthorDto[]) {
+    return await this.prisma.author.createMany({
+      data: createAuthorsDto,
+
+      // ...createAuthorDto,
+      // birthDate: createAuthorDto.birthDate
+      //   ? new Date(createAuthorDto.birthDate)
+      //   : undefined,
+    });
+  }
+
   async findAll(): Promise<Author[]> {
     return await this.prisma.author.findMany();
   }

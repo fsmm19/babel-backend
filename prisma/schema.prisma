@@ -34,7 +34,7 @@ model Author {
 
 model Book {
   id                      String                @id @default(uuid()) @db.Uuid
-  isbn_13                 String                @unique
+  isbn13                  String                @unique
   edition                 Int?
   numberOfPages           Int?
   bibliographicMaterial   BibliographicMaterial @relation(fields: [bibliographicMaterialId], references: [id])

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  ParseArrayPipe,
 } from '@nestjs/common';
 
 import { AuthorsService } from './authors.service';
@@ -22,6 +23,14 @@ export class AuthorsController {
   @Post()
   create(@Body() createAuthorDto: CreateAuthorDto): Promise<Author> {
     return this.authorsService.create(createAuthorDto);
+  }
+
+  @Post('batch')
+  createMany(
+    @Body(new ParseArrayPipe({ items: CreateAuthorDto }))
+    createAuthorsDto: CreateAuthorDto[],
+  ) {
+    return this.authorsService.createMany(createAuthorsDto);
   }
 
   @Get()

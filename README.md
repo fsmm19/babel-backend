@@ -23,6 +23,20 @@ $ pnpm run start:dev
 
 ## Base de datos
 
+### Variables de entorno
+
+Crear un archivo `.env` en la raíz del proyecto con las siguientes variables de entorno:
+
+```
+POSTGRES_USER=<username>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=<database>
+
+DATABASE_URL="postgresql://<username>:<password>@localhost:5432/<database>?schema=public"
+```
+
+### Levantar contenedor de PostgreSQL
+
 El proyecto utiliza PostgreSQL como base de datos. Se debe tener Docker y Docker Compose instalados para levantar el contenedor de la base de datos.
 
 ```bash
@@ -32,11 +46,11 @@ $ docker-compose up -d
 ### Migraciones
 
 ```bash
-$ pnpm run migrate dev --name <migration_name>
+$ pnpm prisma migrate dev --name <migration_name>
 ```
 
 ### Generar cliente Prisma
 
 ```bash
-$ pnpm run generate
+$ pnpm prisma generate
 ```

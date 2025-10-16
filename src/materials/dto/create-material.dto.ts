@@ -1,15 +1,12 @@
 import {
-  ArrayNotEmpty,
   IsArray,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { MaterialType } from 'src/generated/prisma/enums';
-import { CreateAuthorDto } from '../authors/dto/create-author.dto';
+import { ConnectOrCreateAuthorDto } from '../authors/dto/connect-or-create-author.dto';
 
 export class CreateMaterialDto {
   @IsNotEmpty()
@@ -21,12 +18,9 @@ export class CreateMaterialDto {
   @IsString()
   subtitle?: string;
 
-  @IsEnum(MaterialType)
-  type: MaterialType;
-
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateAuthorDto)
-  authors: CreateAuthorDto[];
+  @Type(() => ConnectOrCreateAuthorDto)
+  authors?: ConnectOrCreateAuthorDto[];
 }

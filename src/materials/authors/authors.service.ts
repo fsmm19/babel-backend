@@ -5,6 +5,7 @@ import { Author } from 'src/generated/prisma/client';
 
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
+import { BatchPayload } from 'src/generated/prisma/internal/prismaNamespace';
 
 @Injectable()
 export class AuthorsService {
@@ -14,21 +15,20 @@ export class AuthorsService {
     return await this.prisma.author.create({
       data: {
         ...createAuthorDto,
-        birthDate: createAuthorDto.birthDate
-          ? new Date(createAuthorDto.birthDate)
-          : undefined,
+        birthDate: createAuthorDto.birthDate ?? undefined,
       },
     });
   }
 
-  async createMany(createAuthorsDto: CreateAuthorDto[]) {
+  async createMany(createAuthorsDto: CreateAuthorDto[]): Promise<BatchPayload> {
     return await this.prisma.author.createMany({
-      data: createAuthorsDto,
-
-      // ...createAuthorDto,
-      // birthDate: createAuthorDto.birthDate
-      //   ? new Date(createAuthorDto.birthDate)
-      //   : undefined,
+      data: createAuthorsDto.map((author) => ({
+        firstName: author.firstName,
+        middleName: author.middleName,
+        lastName: author.lastName,
+        nationality: author.nationality,
+        birthDate: author.birthDate ? new Date(author.birthDate) : undefined,
+      })),
     });
   }
 
@@ -52,9 +52,7 @@ export class AuthorsService {
       where: { id },
       data: {
         ...updateAuthorDto,
-        birthDate: updateAuthorDto.birthDate
-          ? new Date(updateAuthorDto.birthDate)
-          : undefined,
+        birthDate: updateAuthorDto.birthDate ?? undefined,
       },
     });
   }

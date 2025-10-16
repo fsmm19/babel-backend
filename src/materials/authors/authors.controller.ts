@@ -12,6 +12,7 @@ import {
 
 import { AuthorsService } from './authors.service';
 import { Author } from 'src/generated/prisma/client';
+import { BatchPayload } from 'src/generated/prisma/internal/prismaNamespace';
 
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
@@ -29,7 +30,7 @@ export class AuthorsController {
   createMany(
     @Body(new ParseArrayPipe({ items: CreateAuthorDto }))
     createAuthorsDto: CreateAuthorDto[],
-  ) {
+  ): Promise<BatchPayload> {
     return this.authorsService.createMany(createAuthorsDto);
   }
 

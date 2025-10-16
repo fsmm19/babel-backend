@@ -1,53 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthorsService } from '../authors/authors.service';
 import { Book } from 'src/generated/prisma/client';
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authorsService: AuthorsService,
+  ) {}
 
   async create(createBookDto: CreateBookDto): Promise<Book> {
-    const { title, subtitle, type, authors, isbn13, edition, numberOfPages } =
-      createBookDto;
+    const { title, subtitle, authors, ...bookData } = createBookDto;
+    const materialData = { title, subtitle };
+    const connectedAuthors: { id: string }[] = [];
 
-    const materialData = { title, subtitle, type, authors };
-    const bookData = { isbn13, edition, numberOfPages };
+    return await this.prisma.$transaction(async (tx) => {
+      for (const author of authors || []) {
+        if (author.id) {
+          const existing = await this.authorsService.findOne(author.id);
+          connectedAuthors.push({ id: existing.id });
+        } else if (author.data) {
+          const newAuthor = await this.authorsService.create(author.data);
+          connectedAuthors.push({ id: newAuthor.id });
+        }
+      }
 
-    return await this.prisma.book.create({
-      data: {
-        bibliographicMaterial: {
-          create: {
-            ...materialData,
-            authors: {
-              connectOrCreate: authors.map((author) => ({
-                where: {
-                  firstName_middleName_lastName_nationality: {
-                    firstName: author.firstName,
-                    middleName: author.middleName ?? '',
-                    lastName: author.lastName,
-                    nationality: author.nationality ?? '',
-                  },
-                },
-                create: {
-                  ...author,
-                  middleName: author.middleName ?? '',
-                  nationality: author.nationality ?? '',
-                  birthDate: author.birthDate
-                    ? new Date(author.birthDate)
-                    : undefined,
-                },
-              })),
+      const book = await tx.book.create({
+        data: {
+          bibliographicMaterial: {
+            create: {
+              ...materialData,
+              type: 'BOOK',
+              authors: {
+                connect: connectedAuthors,
+              },
+            },
+          },
+          ...bookData,
+        },
+        include: {
+          bibliographicMaterial: {
+            include: {
+              authors: true,
             },
           },
         },
-        ...bookData,
-      },
-      include: {
-        bibliographicMaterial: true,
-      },
+      });
+
+      return book;
     });
   }
 
@@ -61,15 +65,24 @@ export class BooksService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async findOne(id: string) {
+    const book = await this.prisma.book.findUnique({
+      where: { id },
+    });
+    if (!book) throw new NotFoundException(`Book with ID ${id} not found`);
+
+    return book;
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
+  update(id: string, updateBookDto: UpdateBookDto) {
     return `This action updates a #${id} book`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async remove(id: string) {
+    await this.findOne(id);
+
+    return await this.prisma.book.delete({
+      where: { id },
+    });
   }
 }

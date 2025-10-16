@@ -1,4 +1,6 @@
+import { Type } from 'class-transformer';
 import {
+  IsDate,
   IsDateString,
   IsISO31661Alpha3,
   IsNotEmpty,
@@ -27,6 +29,7 @@ export class CreateAuthorDto {
   nationality?: string;
 
   @IsOptional()
-  @IsDateString()
+  @Type(() => Date)
+  @IsDate()
   birthDate?: Date;
 }
